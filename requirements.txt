@@ -1,6 +1,6 @@
 # Pinned majors. fastmcp's auth surface has shifted between major versions
 # in the past — see SECURITY.md before bumping it.
-fastmcp[azure]>=3.0.0,<4.0.0
+fastmcp[azure]>=3.3.0,<4.0.0
 azure-identity>=1.17.0,<2.0.0
 httpx>=0.27.0,<1.0.0
 uvicorn>=0.30.0,<1.0.0
