@@ -1,0 +1,30 @@
+# Copy this file to terraform.tfvars and replace the placeholders.
+# (terraform.tfvars is gitignored; this file is not.)
+
+# Required ----------------------------------------------------------------
+
+# Your Azure subscription and tenant.
+subscription_id = "00000000-0000-0000-0000-000000000000"
+tenant_id       = "00000000-0000-0000-0000-000000000000"
+
+# GitHub repo that will deploy via OIDC. Format: "owner/repo".
+github_repo = "your-handle/your-repo"
+
+# Tag for resource ownership tracking.
+owner = "your-name"
+
+# Optional ----------------------------------------------------------------
+
+# App Service names must be globally unique, so override the default if
+# you're not the only one trying "pbi-mcp". Lowercase, hyphens, <= 21 chars.
+# Must start/end with a letter or number and cannot contain consecutive hyphens.
+project_name = "pbi-mcp"
+
+location = "eastus2"
+
+# F1 (free tier) WILL NOT WORK — Key Vault refs require a paid tier.
+app_service_sku = "B1"
+
+# Allowlist of MCP client redirect URIs. Path wildcards OK (e.g. /*).
+# A bare "*" is rejected at server startup. Defaults to Claude.ai only.
+# allowed_redirect_uris = "https://claude.ai/api/mcp/*,https://chatgpt.com/connector_platform_oauth_redirect"

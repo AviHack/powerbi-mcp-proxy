@@ -1,0 +1,36 @@
+# Anything not needed at runtime — keep the image small and the build
+# context fast.
+
+# Dev environments and caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# VCS and IDE
+.git/
+.github/
+.gitignore
+.vscode/
+.idea/
+
+# Infra and docs aren't needed in the container
+infra/
+docs/
+
+# Markdown and license
+*.md
+LICENSE
+
+# Local secrets (defense in depth — should never be in tree to begin with)
+.env
+.env.*
+!.env.example
+
+# OS junk
+.DS_Store
+Thumbs.db
