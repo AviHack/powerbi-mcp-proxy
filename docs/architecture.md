@@ -4,6 +4,8 @@
 
 `powerbi-mcp-proxy` is a remote HTTP server implementing the Model Context Protocol. Each user authenticates with their own Microsoft account via Entra ID; the server exchanges that token via On-Behalf-Of (OBO) for a Power BI API token so queries run with the user's own RLS permissions.
 
+![Architecture diagram](assets/architecture.svg)
+
 ## Auth flow
 
 ```

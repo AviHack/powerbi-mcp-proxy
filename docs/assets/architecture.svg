@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420" role="img" aria-labelledby="title desc">
+  <title id="title">Power BI MCP proxy architecture</title>
+  <desc id="desc">MCP clients connect to the self-hosted server, which handles OAuth through Entra ID and exchanges user tokens for Power BI API access.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .box { fill: #ffffff; stroke: #334155; stroke-width: 2; rx: 8; }
+      .soft { fill: #f8fafc; stroke: #64748b; stroke-width: 1.5; rx: 8; }
+      .title { font: 700 18px system-ui, -apple-system, Segoe UI, sans-serif; fill: #0f172a; }
+      .body { font: 14px system-ui, -apple-system, Segoe UI, sans-serif; fill: #334155; }
+      .small { font: 12px system-ui, -apple-system, Segoe UI, sans-serif; fill: #475569; }
+      .line { stroke: #334155; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #64748b; stroke-width: 2; stroke-dasharray: 7 6; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="25" y="35" width="200" height="110" class="box"/>
+  <text x="55" y="76" class="title">MCP Clients</text>
+  <text x="55" y="103" class="body">Claude, ChatGPT,</text>
+  <text x="55" y="126" class="body">Copilot CLI, Cursor</text>
+
+  <rect x="365" y="25" width="250" height="130" class="box"/>
+  <text x="405" y="66" class="title">Self-Hosted Server</text>
+  <text x="405" y="94" class="body">FastMCP + AzureProvider</text>
+  <text x="405" y="118" class="body">DCR redirect allowlist</text>
+  <text x="405" y="140" class="small">Runs in your Azure subscription</text>
+
+  <rect x="735" y="35" width="210" height="110" class="soft"/>
+  <text x="770" y="76" class="title">Entra ID</text>
+  <text x="770" y="103" class="body">User sign-in</text>
+  <text x="770" y="126" class="body">OAuth token issuer</text>
+
+  <rect x="365" y="250" width="250" height="120" class="box"/>
+  <text x="404" y="291" class="title">OBO Exchange</text>
+  <text x="404" y="319" class="body">User token -> Power BI token</text>
+  <text x="404" y="343" class="small">No shared service account</text>
+
+  <rect x="735" y="255" width="210" height="110" class="soft"/>
+  <text x="770" y="296" class="title">Power BI API</text>
+  <text x="770" y="323" class="body">Workspaces, datasets,</text>
+  <text x="770" y="346" class="body">DAX executeQueries</text>
+
+  <path d="M225 90 H365" class="line"/>
+  <text x="257" y="78" class="small">HTTPS /mcp</text>
+
+  <path d="M615 82 H735" class="dash"/>
+  <text x="645" y="70" class="small">OAuth</text>
+
+  <path d="M490 155 V250" class="line"/>
+  <text x="505" y="207" class="small">per request</text>
+
+  <path d="M615 310 H735" class="line"/>
+  <text x="638" y="299" class="small">Bearer token</text>
+
+  <path d="M735 344 C655 395 316 395 225 124" class="dash"/>
+  <text x="455" y="405" class="small">results return to the signed-in user; Power BI RLS still applies</text>
+</svg>

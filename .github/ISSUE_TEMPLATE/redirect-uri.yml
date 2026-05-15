@@ -1,0 +1,55 @@
+name: MCP client redirect URI
+description: Report a verified redirect URI pattern for a client that works with this server
+labels: ["client-compatibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this only after you have completed an end-to-end OAuth connection in your own tenant.
+        Do not include tenant IDs, user emails, tokens, or client secrets.
+
+  - type: input
+    id: client
+    attributes:
+      label: MCP client and version
+      description: e.g. Claude.ai, ChatGPT web, Cursor, GitHub Copilot CLI
+    validations:
+      required: true
+
+  - type: input
+    id: redirect-uri
+    attributes:
+      label: Redirect URI pattern
+      description: The value that should be added to MCP_ALLOWED_REDIRECT_URIS.
+      placeholder: https://example.com/path/*
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tenant-type
+    attributes:
+      label: Tenant type tested
+      options:
+        - Single-tenant Entra app
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification notes
+      description: What did you test, and what succeeded?
+      placeholder: |
+        I deployed with the included Terraform, added this URI pattern, connected the client, completed OAuth, and successfully ran list_workspaces.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant non-sensitive logs
+      description: Optional. Redact tokens, tenant IDs, user IDs, and emails.
+      render: text
+    validations:
+      required: false

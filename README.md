@@ -8,6 +8,10 @@ A self-hosted MCP (Model Context Protocol) server that proxies **Claude**, **Cha
 
 ---
 
+This is a **reference implementation**, not a hosted service. This repository
+does not deploy anything into the maintainer's Azure tenant. You deploy your
+own copy into your own Azure subscription and Entra tenant.
+
 ## The problem
 
 Microsoft's hosted Power BI MCP endpoint at `api.fabric.microsoft.com/v1/mcp/powerbi` has been broken since early 2026:
@@ -48,6 +52,8 @@ Deliberately narrow. Build your own `@mcp.tool()` functions on top of `run_dax_q
 
 ## Architecture
 
+![Architecture diagram](docs/assets/architecture.svg)
+
 ```
 MCP client (Claude / ChatGPT / Copilot)
        │  HTTPS
@@ -62,6 +68,18 @@ MCP client (Claude / ChatGPT / Copilot)
 ```
 
 Full auth flow and component breakdown in [docs/architecture.md](docs/architecture.md).
+
+## Known Working Clients
+
+| Client | Redirect URI pattern | Status |
+|--------|----------------------|--------|
+| Claude.ai | `https://claude.ai/api/mcp/*` | Default pattern |
+| ChatGPT | `https://chatgpt.com/connector_platform_oauth_redirect` | Needs independent verification |
+| GitHub Copilot CLI | TBD | Needs verification |
+| Cursor | TBD | Needs verification |
+
+Verified additions are welcome. Use the MCP client redirect URI issue template
+or open a PR that updates this table and `terraform.tfvars.example`.
 
 ## Quick start
 
@@ -98,7 +116,8 @@ See [docs/azure-setup.md#conditional-access](docs/azure-setup.md#conditional-acc
 
 ### 4. Deploy
 
-Deploy from your own machine:
+See [docs/deployment-azure-app-service.md](docs/deployment-azure-app-service.md)
+for the full Azure App Service deployment guide. The short version:
 
 ```bash
 python -m zipfile -c app.zip pbi_mcp_remote.py requirements.txt
@@ -147,10 +166,12 @@ To run cheaper: deploy the Docker image to a smaller host (Fly.io, Railway, a $5
 |------|--------------|
 | [docs/architecture.md](docs/architecture.md) | Auth + data flow, components, network surface |
 | [docs/azure-setup.md](docs/azure-setup.md) | Admin consent, Conditional Access, Power BI tenant settings |
+| [docs/deployment-azure-app-service.md](docs/deployment-azure-app-service.md) | Recommended Azure App Service deployment path |
 | [docs/github-actions-deploy.md](docs/github-actions-deploy.md) | Optional GitHub Actions deploy setup for your own repo |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Common errors and what they actually mean |
 | [SECURITY.md](SECURITY.md) | Threat model, enforced guards, recommended hardening |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to propose changes |
+| [CHANGELOG.md](CHANGELOG.md) | Release notes |
 
 ## Contributing
 

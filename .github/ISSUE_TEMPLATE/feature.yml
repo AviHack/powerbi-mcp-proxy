@@ -41,5 +41,5 @@ body:
         ### For new MCP client redirect URI patterns
 
         If you've verified that a new MCP client (ChatGPT, Copilot CLI, Cursor, etc.) works end-to-end
-        with this server, just open a PR adding the pattern to `terraform.tfvars.example` and the README,
-        with a one-line note on how you verified it. No need to file an issue first.
+        with this server, use the dedicated "MCP client redirect URI" issue template or open a PR
+        adding the pattern to `terraform.tfvars.example` and the README.

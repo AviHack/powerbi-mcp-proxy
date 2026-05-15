@@ -45,8 +45,12 @@ That information up front is the difference between "I can help" and "I need 6 r
    "
    ```
    The CI workflow does the same on every PR.
-4. **Don't add dependencies casually.** The runtime has five direct dependencies for a reason. If you need a sixth, explain in the PR description why.
-5. **Update the docs** if you change behavior. README, SECURITY.md, troubleshooting — wherever applies.
+4. **Run linting locally:**
+   ```bash
+   ruff check .
+   ```
+5. **Don't add dependencies casually.** The runtime has five direct dependencies for a reason. If you need a sixth, explain in the PR description why.
+6. **Update the docs** if you change behavior. README, SECURITY.md, troubleshooting — wherever applies.
 
 ## Code style
 
