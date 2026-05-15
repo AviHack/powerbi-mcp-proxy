@@ -52,11 +52,6 @@ variable "enable_github_actions_deploy" {
   description = "Create a GitHub Actions OIDC deploy identity for the repository in github_repo."
   type        = bool
   default     = false
-
-  validation {
-    condition     = !var.enable_github_actions_deploy || var.github_repo != null
-    error_message = "github_repo is required when enable_github_actions_deploy is true."
-  }
 }
 
 variable "app_service_sku" {

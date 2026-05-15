@@ -185,6 +185,13 @@ resource "azurerm_key_vault_access_policy" "webapp" {
 resource "azuread_application" "deploy" {
   count        = var.enable_github_actions_deploy ? 1 : 0
   display_name = "${var.project_name}-deploy"
+
+  lifecycle {
+    precondition {
+      condition     = var.github_repo != null
+      error_message = "github_repo is required when enable_github_actions_deploy is true."
+    }
+  }
 }
 
 resource "azuread_service_principal" "deploy" {
