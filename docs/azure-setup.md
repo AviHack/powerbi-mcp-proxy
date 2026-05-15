@@ -80,7 +80,7 @@ In **Power BI Admin Portal → Tenant settings**, verify:
 
 ## 5. Verify deployment
 
-After your first push to `main`:
+After you run the **Build and Deploy** GitHub Actions workflow:
 
 ```bash
 # Watch the GitHub Actions run

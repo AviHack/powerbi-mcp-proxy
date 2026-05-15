@@ -111,7 +111,7 @@ See [docs/azure-setup.md#conditional-access](docs/azure-setup.md#conditional-acc
 
 ### 5. Deploy
 
-Push to `main`. The included GitHub Actions workflow zips the source, authenticates to Azure via OIDC (no long-lived deploy creds), and rolls out via `az webapp deploy`.
+Run the **Build and Deploy** GitHub Actions workflow manually. It zips the source, authenticates to Azure via OIDC (no long-lived deploy creds), and rolls out via `az webapp deploy`.
 
 ### 6. Connect a client
 

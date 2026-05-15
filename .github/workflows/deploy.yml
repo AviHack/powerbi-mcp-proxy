@@ -1,15 +1,7 @@
 name: Build and Deploy
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - 'docs/**'
-      - 'infra/**'
-      - '*.md'
-      - 'LICENSE'
-      - '.github/ISSUE_TEMPLATE/**'
-      - '.github/PULL_REQUEST_TEMPLATE.md'
+  workflow_dispatch:
 
 permissions:
   id-token: write

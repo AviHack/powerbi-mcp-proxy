@@ -33,7 +33,7 @@ output "next_steps" {
     1. Grant admin consent: Portal > Entra ID > App registrations > ${azuread_application.mcp_server.display_name} > API permissions > Grant admin consent.
     2. Add the three github_actions_secrets above as GitHub repo secrets.
     3. (Strongly recommended) Configure Conditional Access scoped to the new app. See docs/azure-setup.md.
-    4. Push to main — the deploy workflow will publish to ${azurerm_linux_web_app.main.default_hostname}.
+    4. Run the Build and Deploy GitHub Actions workflow — it will publish to ${azurerm_linux_web_app.main.default_hostname}.
     5. Connect from your MCP client at https://${azurerm_linux_web_app.main.default_hostname}/mcp
   EOT
 }
