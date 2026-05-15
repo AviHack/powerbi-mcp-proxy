@@ -7,9 +7,6 @@
 subscription_id = "00000000-0000-0000-0000-000000000000"
 tenant_id       = "00000000-0000-0000-0000-000000000000"
 
-# GitHub repo that will deploy via OIDC. Format: "owner/repo".
-github_repo = "your-handle/your-repo"
-
 # Tag for resource ownership tracking.
 owner = "your-name"
 
@@ -28,3 +25,8 @@ app_service_sku = "B1"
 # Allowlist of MCP client redirect URIs. Path wildcards OK (e.g. /*).
 # A bare "*" is rejected at server startup. Defaults to Claude.ai only.
 # allowed_redirect_uris = "https://claude.ai/api/mcp/*,https://chatgpt.com/connector_platform_oauth_redirect"
+
+# Optional: create a GitHub Actions OIDC identity for deploys from your repo.
+# See docs/github-actions-deploy.md.
+# enable_github_actions_deploy = true
+# github_repo = "your-handle/your-repo"

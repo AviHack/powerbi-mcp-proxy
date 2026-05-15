@@ -24,7 +24,7 @@
 | `OnBehalfOfCredential` (`azure-identity`) | OBO token exchange per request, per user |
 | Azure App Service (recommended) | HTTPS termination, hosting |
 | Azure Key Vault (recommended) | `PBI_CLIENT_SECRET`, `JWT_SIGNING_KEY` |
-| GitHub Actions + OIDC | Push-to-deploy without stored Azure credentials |
+| GitHub Actions + OIDC (optional) | Manual deploy workflow for your own repo without stored Azure credentials |
 
 ## Data flow
 

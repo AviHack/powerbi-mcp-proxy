@@ -77,11 +77,11 @@ You're trying to deploy with plaintext HTTP, which would leak OAuth tokens. Use 
 
 You set `MCP_ALLOWED_REDIRECT_URIS=*` (or empty). A bare `*` allows DCR clients to register any redirect URI and intercept tokens. Use specific patterns like `https://claude.ai/api/mcp/*`.
 
-## CI/CD
+## Deployment
 
 ### GitHub Actions smoke test fails with `HTTP 000` repeatedly
 
-The App Service hasn't finished starting up. The workflow waits 12 × 15 seconds = 3 minutes. Cold starts on B1 with package installation can occasionally exceed that. Re-run the job; if it consistently times out, check the App Service log stream for installation errors.
+If you copied the optional workflow from [github-actions-deploy.md](github-actions-deploy.md), the App Service may not have finished starting up. The workflow waits 12 × 15 seconds = 3 minutes. Cold starts on B1 with package installation can occasionally exceed that. Re-run the job; if it consistently times out, check the App Service log stream for installation errors.
 
 ### Smoke test passes but the MCP client says "Couldn't reach the MCP server"
 

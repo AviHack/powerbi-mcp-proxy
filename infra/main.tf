@@ -4,7 +4,7 @@
 #   - Resource group + Key Vault (with secrets)
 #   - Entra app registration (single-tenant, with Power BI Dataset.Read.All)
 #   - Linux Web App + managed identity wired to Key Vault
-#   - GitHub Actions OIDC federation (repo scope)
+#   - Optional GitHub Actions OIDC federation (repo scope)
 #
 # Usage:
 #   cp terraform.tfvars.example terraform.tfvars   # edit the placeholders
@@ -179,20 +179,23 @@ resource "azurerm_key_vault_access_policy" "webapp" {
 }
 
 # ---------------------------------------------------------------------------
-# CI/CD: GitHub Actions OIDC + scoped Contributor role
+# Optional CI/CD: GitHub Actions OIDC + scoped Contributor role
 # ---------------------------------------------------------------------------
 
 resource "azuread_application" "deploy" {
+  count        = var.enable_github_actions_deploy ? 1 : 0
   display_name = "${var.project_name}-deploy"
 }
 
 resource "azuread_service_principal" "deploy" {
-  client_id = azuread_application.deploy.client_id
+  count     = var.enable_github_actions_deploy ? 1 : 0
+  client_id = azuread_application.deploy[0].client_id
 }
 
 # Trust GitHub Actions running on the main branch of var.github_repo only
 resource "azuread_application_federated_identity_credential" "github_main" {
-  application_id = azuread_application.deploy.id
+  count          = var.enable_github_actions_deploy ? 1 : 0
+  application_id = azuread_application.deploy[0].id
   display_name   = "github-actions-main"
   description    = "GitHub Actions deployment from main branch only"
   audiences      = ["api://AzureADTokenExchange"]
@@ -203,7 +206,8 @@ resource "azuread_application_federated_identity_credential" "github_main" {
 # Contributor on the resource group only — needed because zip-deploy /
 # az webapp up calls serverfarms/write, which Website Contributor lacks.
 resource "azurerm_role_assignment" "deploy_contributor" {
+  count                = var.enable_github_actions_deploy ? 1 : 0
   scope                = azurerm_resource_group.main.id
   role_definition_name = "Contributor"
-  principal_id         = azuread_service_principal.deploy.object_id
+  principal_id         = azuread_service_principal.deploy[0].object_id
 }

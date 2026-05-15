@@ -12,15 +12,20 @@ After `terraform apply` succeeds:
 
 This authorizes the app to request `Dataset.Read.All` on behalf of users. Without it, every user sees an "admin consent required" error on first sign-in.
 
-## 2. Add the GitHub Actions secrets and variables
+## 2. Optional GitHub Actions deployment
 
-Run:
+This public repository does not include a live deployment workflow. If you want
+GitHub Actions deployment from your own repo, see
+[github-actions-deploy.md](github-actions-deploy.md).
 
-```bash
-terraform output github_actions_secrets
+To enable Terraform's optional OIDC resources, set:
+
+```hcl
+enable_github_actions_deploy = true
+github_repo                  = "your-handle/your-repo"
 ```
 
-Add the three values as **Repository secrets** at `Settings → Secrets and variables → Actions → Secrets → New repository secret`:
+Then run `terraform apply` and add the `github_actions_secrets` output as repository secrets:
 
 | Secret | Source |
 |--------|--------|
@@ -34,8 +39,6 @@ If you set `project_name` to anything other than the default `pbi-mcp`, also add
 |----------|-------|
 | `AZURE_APP_NAME` | Your `project_name` (e.g. `acme-pbi-mcp`) |
 | `AZURE_RESOURCE_GROUP` | Your `project_name` + `-rg` (e.g. `acme-pbi-mcp-rg`) |
-
-If you skip this step on a renamed project, the deploy workflow will silently push to a non-existent app and the smoke test will fail.
 
 ## 3. Conditional Access
 
@@ -80,13 +83,9 @@ In **Power BI Admin Portal → Tenant settings**, verify:
 
 ## 5. Verify deployment
 
-After you run the **Build and Deploy** GitHub Actions workflow:
+After deploying the app code:
 
 ```bash
-# Watch the GitHub Actions run
-gh run watch
-
-# Then probe the endpoint
 curl -s -o /dev/null -w "%{http_code}\n" https://<your-project-name>.azurewebsites.net/mcp
 # Expected: 401 (unauthenticated) or 405 (method not allowed) — both mean the server is up
 ```

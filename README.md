@@ -70,15 +70,15 @@ Full auth flow and component breakdown in [docs/architecture.md](docs/architectu
 - An **Azure subscription** with admin rights to create app registrations
 - **Power BI tenant setting** "Dataset Execute Queries REST API" enabled
 - **Terraform** `>= 1.5.0`
+- **Azure CLI** for deployment
 - **Python** `3.11+` (for local development only)
-- A **GitHub repo** you'll push the code to (for the included CI/CD)
 
 ### 1. Configure and apply Terraform
 
 ```bash
 cd infra
 cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars: set subscription_id, tenant_id, github_repo, owner
+# Edit terraform.tfvars: set subscription_id, tenant_id, owner
 terraform init
 terraform plan        # review every resource before applying
 terraform apply
@@ -90,30 +90,28 @@ When apply succeeds, Terraform prints a `next_steps` output that walks you throu
 
 Portal → Entra ID → App registrations → `<your-project>-server` → API permissions → **Grant admin consent**.
 
-### 3. Add the GitHub Actions secrets
-
-`terraform output github_actions_secrets` prints the three values. Add them to **Settings → Secrets and variables → Actions → New repository secret**:
-
-- `AZURE_CLIENT_ID`
-- `AZURE_TENANT_ID`
-- `AZURE_SUBSCRIPTION_ID`
-
-If you renamed `project_name` away from the default `pbi-mcp`, also add **repo variables** (same page, **Variables** tab):
-
-- `AZURE_APP_NAME` = your `project_name`
-- `AZURE_RESOURCE_GROUP` = your `project_name` + `-rg`
-
-### 4. (Strongly recommended) Configure Conditional Access
+### 3. (Strongly recommended) Configure Conditional Access
 
 Your Entra app's sign-in surface is now exposed to the public internet. Without Conditional Access (or at minimum MFA), one phished password gives an attacker OBO'd Power BI access to that user.
 
 See [docs/azure-setup.md#conditional-access](docs/azure-setup.md#conditional-access) for the policy. Scope it to the new app registration — it won't affect anything else in your tenant.
 
-### 5. Deploy
+### 4. Deploy
 
-Run the **Build and Deploy** GitHub Actions workflow manually. It zips the source, authenticates to Azure via OIDC (no long-lived deploy creds), and rolls out via `az webapp deploy`.
+Deploy from your own machine:
 
-### 6. Connect a client
+```bash
+python -m zipfile -c app.zip pbi_mcp_remote.py requirements.txt
+az webapp deploy \
+  --name <your-project-name> \
+  --resource-group <your-project-name>-rg \
+  --src-path app.zip \
+  --type zip
+```
+
+If you want deploys from your own GitHub repo instead, see [docs/github-actions-deploy.md](docs/github-actions-deploy.md). This public repo does not deploy anything automatically.
+
+### 5. Connect a client
 
 Add the MCP endpoint to your client's custom connector configuration:
 
@@ -139,7 +137,7 @@ For testing against a real MCP client locally, expose `localhost:8000` via `ngro
 
 ## Cost
 
-The default Terraform path runs on **Azure App Service B1 Linux** (~$13/month). Key Vault is a few cents. GitHub Actions OIDC is free.
+The default Terraform path runs on **Azure App Service B1 Linux** (~$13/month). Key Vault is a few cents. Optional GitHub Actions OIDC has no direct cost.
 
 To run cheaper: deploy the Docker image to a smaller host (Fly.io, Railway, a $5 VPS) — see the included [Dockerfile](Dockerfile). You lose the Key Vault wiring and have to manage secrets yourself; read [SECURITY.md](SECURITY.md) first.
 
@@ -148,7 +146,8 @@ To run cheaper: deploy the Docker image to a smaller host (Fly.io, Railway, a $5
 | File | What's in it |
 |------|--------------|
 | [docs/architecture.md](docs/architecture.md) | Auth + data flow, components, network surface |
-| [docs/azure-setup.md](docs/azure-setup.md) | Admin consent, Conditional Access, Power BI tenant settings, GitHub Actions secrets |
+| [docs/azure-setup.md](docs/azure-setup.md) | Admin consent, Conditional Access, Power BI tenant settings |
+| [docs/github-actions-deploy.md](docs/github-actions-deploy.md) | Optional GitHub Actions deploy setup for your own repo |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Common errors and what they actually mean |
 | [SECURITY.md](SECURITY.md) | Threat model, enforced guards, recommended hardening |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to propose changes |

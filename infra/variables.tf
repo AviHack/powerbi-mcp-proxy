@@ -37,12 +37,25 @@ variable "project_name" {
 }
 
 variable "github_repo" {
-  description = "GitHub repository in owner/repo format for OIDC federation"
+  description = "GitHub repository in owner/repo format for optional OIDC deployment. Required only when enable_github_actions_deploy is true."
   type        = string
+  default     = null
+  nullable    = true
 
   validation {
-    condition     = can(regex("^[^/]+/[^/]+$", var.github_repo))
-    error_message = "github_repo must be in owner/repo format, e.g. 'AviHack/powerbi-mcp-proxy'."
+    condition     = var.github_repo == null || can(regex("^[^/]+/[^/]+$", var.github_repo))
+    error_message = "github_repo must be null or in owner/repo format, e.g. 'AviHack/powerbi-mcp-proxy'."
+  }
+}
+
+variable "enable_github_actions_deploy" {
+  description = "Create a GitHub Actions OIDC deploy identity for the repository in github_repo."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.enable_github_actions_deploy || var.github_repo != null
+    error_message = "github_repo is required when enable_github_actions_deploy is true."
   }
 }
 

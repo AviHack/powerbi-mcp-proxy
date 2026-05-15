@@ -1,3 +1,44 @@
+# Optional GitHub Actions Deploy
+
+This public repo does not include a live deploy workflow. That is deliberate:
+each deployment belongs to the adopter's Azure subscription, Entra tenant, and
+GitHub repository.
+
+If you want push-button deploys from your own fork or copy, enable the optional
+Terraform resources and add this workflow in your repository.
+
+## 1. Enable the Terraform OIDC resources
+
+In `infra/terraform.tfvars`:
+
+```hcl
+enable_github_actions_deploy = true
+github_repo                  = "your-handle/your-repo"
+```
+
+Then run:
+
+```bash
+terraform apply
+terraform output github_actions_secrets
+```
+
+Add the output values as repository secrets:
+
+- `AZURE_CLIENT_ID`
+- `AZURE_TENANT_ID`
+- `AZURE_SUBSCRIPTION_ID`
+
+If you changed `project_name` from `pbi-mcp`, also add repository variables:
+
+- `AZURE_APP_NAME`
+- `AZURE_RESOURCE_GROUP`
+
+## 2. Add the workflow
+
+Create `.github/workflows/deploy.yml` in your own repository:
+
+```yaml
 name: Build and Deploy
 
 on:
@@ -7,7 +48,6 @@ permissions:
   id-token: write
   contents: read
 
-# Cancel any in-flight deploy when a new commit lands.
 concurrency:
   group: deploy
   cancel-in-progress: false
@@ -16,9 +56,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      # Set these as GitHub Actions variables (Settings → Secrets and variables → Actions → Variables)
-      # if you changed `project_name` away from the default in Terraform.
-      APP_NAME:       ${{ vars.AZURE_APP_NAME || 'pbi-mcp' }}
+      APP_NAME: ${{ vars.AZURE_APP_NAME || 'pbi-mcp' }}
       RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP || 'pbi-mcp-rg' }}
 
     steps:
@@ -26,8 +64,6 @@ jobs:
 
       - name: Build deployment artifact
         run: |
-          # App Service runs its own pip install at deploy time
-          # (SCM_DO_BUILD_DURING_DEPLOYMENT=true). We just ship the source.
           zip -r app.zip pbi_mcp_remote.py requirements.txt
 
       - name: Login to Azure (OIDC)
@@ -47,16 +83,15 @@ jobs:
 
       - name: Smoke test
         run: |
-          echo "Waiting for app to come up..."
           url="https://${APP_NAME}.azurewebsites.net/mcp"
           for i in $(seq 1 12); do
             status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "000")
             if [ "$status" = "401" ] || [ "$status" = "405" ]; then
-              echo "Server is up (HTTP $status — auth or method gate, as expected for /mcp without a session)"
+              echo "Server is up (HTTP $status)"
               exit 0
             fi
-            echo "Attempt $i/12: HTTP $status — waiting 15s..."
+            echo "Attempt $i/12: HTTP $status; waiting 15s..."
             sleep 15
           done
-          echo "WARNING: smoke test timed out without seeing a 401/405"
           exit 1
+```

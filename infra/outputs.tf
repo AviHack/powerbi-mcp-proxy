@@ -19,21 +19,21 @@ output "mcp_app_display_name" {
 }
 
 output "github_actions_secrets" {
-  description = "Add these three values as repo secrets in Settings > Secrets and variables > Actions"
-  value = {
-    AZURE_CLIENT_ID       = azuread_application.deploy.client_id
+  description = "Optional GitHub Actions deploy secrets. Non-null only when enable_github_actions_deploy is true."
+  value = var.enable_github_actions_deploy ? {
+    AZURE_CLIENT_ID       = azuread_application.deploy[0].client_id
     AZURE_TENANT_ID       = var.tenant_id
     AZURE_SUBSCRIPTION_ID = var.subscription_id
-  }
+  } : null
 }
 
 output "next_steps" {
   description = "Things you still have to do manually after terraform apply succeeds"
   value       = <<-EOT
     1. Grant admin consent: Portal > Entra ID > App registrations > ${azuread_application.mcp_server.display_name} > API permissions > Grant admin consent.
-    2. Add the three github_actions_secrets above as GitHub repo secrets.
+    2. Deploy the app code with az webapp deploy, or enable the optional GitHub Actions deploy path in docs/github-actions-deploy.md.
     3. (Strongly recommended) Configure Conditional Access scoped to the new app. See docs/azure-setup.md.
-    4. Run the Build and Deploy GitHub Actions workflow — it will publish to ${azurerm_linux_web_app.main.default_hostname}.
+    4. Verify the endpoint at https://${azurerm_linux_web_app.main.default_hostname}/mcp.
     5. Connect from your MCP client at https://${azurerm_linux_web_app.main.default_hostname}/mcp
   EOT
 }
