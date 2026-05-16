@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python lint + import smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Import smoke test
+        env:
+          PBI_CLIENT_ID:     "00000000-0000-0000-0000-000000000000"
+          PBI_CLIENT_SECRET: "placeholder"
+          PBI_TENANT_ID:     "11111111-1111-1111-1111-111111111111"
+          JWT_SIGNING_KEY:   "placeholder-signing-key-for-ci"
+          MCP_SERVER_URL:    "http://localhost:8000"
+        run: |
+          python -c "import pbi_mcp_remote; print('OK:', type(pbi_mcp_remote.app).__name__)"
+
+      - name: Verify defensive guards fire
+        run: |
+          python <<'EOF'
+          import os, sys, importlib
+
+          def expect_failure(label, env):
+              for k, v in env.items():
+                  os.environ[k] = v
+              sys.modules.pop('pbi_mcp_remote', None)
+              try:
+                  importlib.import_module('pbi_mcp_remote')
+                  print(f"FAIL [{label}]: expected RuntimeError, got clean import")
+                  sys.exit(1)
+              except RuntimeError as e:
+                  print(f"OK   [{label}]: {str(e)[:80]}")
+
+          # Baseline valid config
+          base = {
+              'PBI_CLIENT_ID':     '00000000-0000-0000-0000-000000000000',
+              'PBI_CLIENT_SECRET': 'placeholder',
+              'PBI_TENANT_ID':     '11111111-1111-1111-1111-111111111111',
+              'JWT_SIGNING_KEY':   'placeholder-signing-key-for-ci',
+              'MCP_SERVER_URL':    'http://localhost:8000',
+          }
+          os.environ.update(base)
+
+          # Each guard should reject its specific misconfiguration
+          expect_failure('multi-tenant common',  {**base, 'PBI_TENANT_ID': 'common'})
+          expect_failure('multi-tenant orgs',    {**base, 'PBI_TENANT_ID': 'organizations'})
+          expect_failure('plaintext on host',    {**base, 'MCP_SERVER_URL': 'http://example.com:8000'})
+          expect_failure('bare wildcard',        {**base, 'MCP_ALLOWED_REDIRECT_URIS': '*'})
+          EOF
+
+  terraform:
+    name: Terraform validate + fmt
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init (backend-skipped)
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        run: terraform validate

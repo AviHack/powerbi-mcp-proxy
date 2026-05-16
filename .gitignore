@@ -1,0 +1,37 @@
+# Secrets — NEVER commit any of these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.token_cache.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Azure CLI
+.azure/
+
+# Terraform — tfstate often contains secrets in plaintext
+infra/**/.terraform/
+infra/**/terraform.tfstate
+infra/**/terraform.tfstate.backup
+infra/**/terraform.tfvars
+!infra/terraform.tfvars.example
+*.tfplan
+# (.terraform.lock.hcl IS committed — it pins provider versions across machines)
+
+# Ruff cache
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

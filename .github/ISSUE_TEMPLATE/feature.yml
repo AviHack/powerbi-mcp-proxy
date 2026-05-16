@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose a change. For new MCP client redirect URI patterns, see the bottom of this form.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please read [CONTRIBUTING.md](https://github.com/AviHack/powerbi-mcp-proxy/blob/main/CONTRIBUTING.md)
+        before opening. Some changes (multi-tenant, domain-specific tools) are explicitly out of scope.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      placeholder: |
+        Right now, doing X requires Y manual steps because Z.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      placeholder: |
+        Add a foo bar that does baz.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Useful to know what you ruled out and why.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### For new MCP client redirect URI patterns
+
+        If you've verified that a new MCP client (ChatGPT, Copilot CLI, Cursor, etc.) works end-to-end
+        with this server, use the dedicated "MCP client redirect URI" issue template or open a PR
+        adding the pattern to `terraform.tfvars.example` and the README.

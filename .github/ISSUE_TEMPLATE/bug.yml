@@ -1,0 +1,82 @@
+name: Bug report
+description: Something is broken or behaving unexpectedly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out as much as you can. Vague reports take 5+ round-trips to resolve.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect to happen, and what actually happened?
+      placeholder: |
+        Expected: connecting Claude to https://my-app.azurewebsites.net/mcp succeeds.
+        Actual: Claude shows "Couldn't reach the MCP server."
+    validations:
+      required: true
+
+  - type: input
+    id: client
+    attributes:
+      label: MCP client and version
+      description: e.g. "Claude Desktop 1.2.3", "ChatGPT (web)", "GitHub Copilot CLI v1.0.7"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tenant-config
+    attributes:
+      label: Tenant configuration
+      description: How is your Entra app registration configured?
+      options:
+        - Single-tenant (AzureADMyOrg) — recommended
+        - Multi-tenant (AzureADMultipleOrgs) — note that the server refuses this
+        - Personal Microsoft accounts (AzureADandPersonalMicrosoftAccount)
+        - Not sure / haven't checked
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: How did you deploy?
+      options:
+        - Included Terraform → Azure App Service
+        - Docker (own host — Fly.io, Railway, etc.)
+        - Local development (uvicorn on localhost)
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error message
+      description: |
+        Paste the exact error. If you see an AADSTS code, include it.
+        Redact the tenant GUID and any user-identifying info before pasting.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Server logs (if you have them)
+      description: |
+        Last ~20 lines from `az webapp log tail` or your equivalent.
+        Redact tokens (anything that starts with `eyJ`).
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What did you already try?
+      description: e.g. "Granted admin consent, verified Conditional Access doesn't apply, cleared the client's connector cache..."
+    validations:
+      required: false
